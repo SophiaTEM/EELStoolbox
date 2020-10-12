@@ -225,15 +225,16 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                             eelsSI_woBG[i, j, k] = eelsSI_data[i, j, h] - linearfunc(energy[h], Linear[i, j, 0], Linear[i, j, 1])
                         eelsSI_woBG_energy[k, 0] = energy[h]
                         k = k + 1 
-            
-        eelsSI_woBG_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0]])
-        eelsSI_woBG_smooth = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0]])
-        eelsSI_woBG_smooth_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0]])
-    
+                
+        eelsSI_woBG_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
+        eelsSI_woBG_smooth = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
+        eelsSI_woBG_smooth_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
+
         for i in range(np.shape(eelsSI_data)[0]):
-            eelsSI_woBG_zero[i, j, :] = eelsSI_woBG[i, j, :] - np.min(eelsSI_woBG[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
-            eelsSI_woBG_smooth[i, j, :] = savgol_filter(eelsSI_woBG[i, j, :], 9, 2)
-            eelsSI_woBG_smooth_zero[i, j, :] = eelsSI_woBG_smooth[i, j, :] - np.min(eelsSI_woBG_smooth[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
+            for j in range(np.shape(eelsSI_data)[1]):
+                eelsSI_woBG_zero[i, j, :] = eelsSI_woBG[i, j, :] - np.min(eelsSI_woBG[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
+                eelsSI_woBG_smooth[i, j, :, 0] = savgol_filter(eelsSI_woBG[i, j, :, 0], 9, 2)
+                eelsSI_woBG_smooth_zero[i, j, :] = eelsSI_woBG_smooth[i, j, :] - np.min(eelsSI_woBG_smooth[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
     
     return eelsSI_woBG, eelsSI_woBG_smooth, eelsSI_woBG_energy, eelsSI_woBG_zero, eelsSI_woBG_smooth_zero
 
@@ -344,8 +345,23 @@ def peak_deconvolution_flexible(eels_SI_woBG, energy, SIregion1, SIregion2, star
                 gauss_peak[i, :, 4] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_5[i])
                 sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3] + gauss_peak[i, :, 4]
                 del popt_fit, pcov_fit
-                
+
     return sumspec, parameters, gauss_peak
+
+
+def signal_intensity(eelsSI, startEnergy, endEnergy):
+
+    if np.shape(eelsSI)[0] == 3:
+        eelsIntensity = np.zeros([np.shape(eelsSI)[0], np.shape(eelsSI)[1]])
+        for i in range(np.shape(eelsSI)[0]):
+            for j in range(np.shape(eelsSI)[1]):
+                eelsIntensity[i, j] = sum(eelsSI[i, j])
+    elif np.shape(eelsSI)[0] == 2:
+        eelsIntensity = np.zeros([np.shape(eelsSI)[0], 1])
+        for i in range(np.shape(eelsSI)[0]):
+            eelsIntensity[i] = sum(eelsSI[i])
+
+    return eelsIntensity
 
 
 def roll_av(data, windowsize):
