@@ -32,12 +32,7 @@ Keyword | Equation | Literature reference
 'Linear' | A*x + t |
 
 ```
-BkgModel = 'PL', 'Poly1', 'Poly2' or 'Linear'
-startBkg = start of background window in eV
-endBkg = end of background window in eV
-(fitpara = Guess values to be used as starting parameters for the background fit)
-(fitbounds = upper and lower limit for the fitting parameters)
-Bkg_fit(EELSdata, EnergyValues, startBkg, endBkg, BkgModel, fitpara=None, fitbounds=None)
+Bkg_fit(EELSdata, EnergyValues, startBkg, endBkg, BkgModel, fitpara, fitbounds)
 ```
 
 ### Step 4 - Deconvolution of the signal:
