@@ -253,6 +253,47 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                 eelsSI_woBG_smooth[i, j, :, 0] = savgol_filter(eelsSI_woBG[i, j, :, 0], 9, 2)
                 eelsSI_woBG_smooth_zero[i, j, :] = eelsSI_woBG_smooth[i, j, :] - np.min(eelsSI_woBG_smooth[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
 
+        if BkgModel == 'Poly1':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
+            plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 3]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
+            plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 3]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
+            plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 3]))    
+        elif BkgModel == 'Poly2':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/2), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 3]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 3]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 3]))
+        elif BkgModel == 'PL':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
+            plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
+            plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
+            plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1]))
+        elif BkgModel == 'Linear':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
+            plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], Linear[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
+            plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], Linear[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
+            plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], Linear[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1]))
+
     return eelsSI_woBG, eelsSI_woBG_smooth, eelsSI_woBG_energy, eelsSI_woBG_zero, eelsSI_woBG_smooth_zero
 
 
