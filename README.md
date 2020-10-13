@@ -9,23 +9,35 @@ If you recorded a spectrum image using Gatan Digital Micrograph Version XYZ I re
 Alignment of the dataset. In dependence of the nature of your dataset different methods are available. 
 __Method 1:__
 If your spectra contain the zero-loss peak (ZLP) you can directly use the ZLP to align you data. The function requires the dispersion (eV/channel) and a threshold value for the intensity of the ZLP maximum. 
-```python
-[EELSaligned, energyscale, appliedShifts] = MWf.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
-print s
+```
+[EELSaligned, energyscale, appliedShifts] = eels.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
 ```
 
 __Method 2:__
 If you recorded the spectra in Dual-Imaging mode you can use the ZLP spectra to align your high-loss data.
-```python
-[EELSaligned, energyscale, appliedShifts] = MWf.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
-print s
+```
+[EELSaligned, energyscale, appliedShifts] = eels.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
 ```
 
 __Method 3:__ 
 If your data do not contain the ZLP, but all contain the same edge (whose shape doesn't change dramatically, e.g. C-K edge) you can use this edge to align your data using cross-correlation of your spectra. This requires a little more adjustements as described in the following. 
 
 ### Step 3 - Background correction:
-Different models to subtract the background from the EELS dataset are available. The powerlaw model works best for most high-loss edges, while the polynomial models fit low-loss data the best. The mathematic formulas are summarized in the following equation together with the respective literature reference.  
+Different models to subtract the background from the EELS dataset are available. The background is fitted within a small energy window defined close to the onset of the elemental edge (*startBkg* and *endBkg*). The powerlaw (*'PL'*) model works best for most high-loss edges, while the polynomial models fit low-loss data best. The underlying mathematic equations are summarized in the following together with the respective literature reference. Especially for the functions *'Poly1'* and *'Poly2'* starting parameters (*fitpara*) and bounds (*fitbounds*) should be provided, otherwise the fitting most likely fails. 
+Keyword | Equation | Literature reference
+------------ | ------------- | -------------
+'PL' | A*x^(-r) |
+'Poly1' | A*(x + m)^(-r) + b |
+'Poly2' | A*(x + m)^(-r-(c*x)) |
+'Linear' | A*x + t |
+
+```
+Bkg_fit(EELSdata, EnergyValues, startBkg, endBkg, BkgModel, fitpara, fitbounds)
+```
 
 ### Step 4 - Deconvolution of the signal:
-Two different concepts can be used to deconvolute the data. If the exact position of the edge is unknown (can't be determined exactly) the energy gaps between the spectra must be kept constants, while in some cases the position of the peaks changes.
+__Method 1:__
+Deconvolution of the spectra 
+
+__Method 2:__
+Energy window between the peaks is fixed, well suited for spectra where the ZLP data are not available and slight shifting of the peaks during the acquisition must be compensated.
