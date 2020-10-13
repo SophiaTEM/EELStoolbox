@@ -25,7 +25,13 @@ __Method 3:__
 If your data do not contain the ZLP, but all contain the same edge (whose shape doesn't change dramatically, e.g. C-K edge) you can use this edge to align your data using cross-correlation of your spectra. This requires a little more adjustements as described in the following. 
 
 ### Step 3 - Background correction:
-Different models to subtract the background from the EELS dataset are available. The powerlaw model works best for most high-loss edges, while the polynomial models fit low-loss data the best. The mathematic formulas are summarized in the following equation together with the respective literature reference.  
+Different models to subtract the background from the EELS dataset are available. The powerlaw model works best for most high-loss edges, while the polynomial models fit low-loss data best. The underlying mathematic equations are summarized in the following together with the respective literature reference. 
+Keyword | Equation | Literature reference
+------------ | ------------- | -------------
+'PL' | A*x^(-r) |
+'Poly1' | A*(x + m)^(-r) + b |
+'Poly2' | A*(x + m)^(-r-(c*x)) |
+'Linear' | A*x + t |
 
 ### Step 4 - Deconvolution of the signal:
 Two different concepts can be used to deconvolute the data. If the exact position of the edge is unknown (can't be determined exactly) the energy gaps between the spectra must be kept constants, while in some cases the position of the peaks changes.
