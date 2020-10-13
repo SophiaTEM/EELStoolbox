@@ -23,7 +23,7 @@ __Method 3:__
 If your data do not contain the ZLP, but all contain the same edge (whose shape doesn't change dramatically, e.g. C-K edge) you can use this edge to align your data using cross-correlation of your spectra. This requires a little more adjustements as described in the following. 
 
 ### Step 3 - Background correction:
-Different models to subtract the background from the EELS dataset are available. The powerlaw model works best for most high-loss edges, while the polynomial models fit low-loss data best. The underlying mathematic equations are summarized in the following together with the respective literature reference. Especially for the functions 'Poly1' and 'Poly2' starting parameters and bounds should be provided, otherwise the fitting most likely fails. 
+Different models to subtract the background from the EELS dataset are available. The background is fitted within a small energy window defined close to the onset of the elemental edge (*startBkg* and *endBkg*). The powerlaw (*'PL'*) model works best for most high-loss edges, while the polynomial models fit low-loss data best. The underlying mathematic equations are summarized in the following together with the respective literature reference. Especially for the functions *'Poly1'* and *'Poly2'* starting parameters (*fitpara*) and bounds (*fitbounds*) should be provided, otherwise the fitting most likely fails. 
 Keyword | Equation | Literature reference
 ------------ | ------------- | -------------
 'PL' | A*x^(-r) |
