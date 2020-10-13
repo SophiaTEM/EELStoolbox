@@ -9,13 +9,13 @@ If you recorded a spectrum image using Gatan Digital Micrograph Version XYZ I re
 Alignment of the dataset. In dependence of the nature of your dataset different methods are available. 
 __Method 1:__
 If your spectra contain the zero-loss peak (ZLP) you can directly use the ZLP to align you data. The function requires the dispersion (eV/channel) and a threshold value for the intensity of the ZLP maximum. 
-```python
+```
 [EELSaligned, energyscale, appliedShifts] = eels.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
 ```
 
 __Method 2:__
 If you recorded the spectra in Dual-Imaging mode you can use the ZLP spectra to align your high-loss data.
-```python
+```
 [EELSaligned, energyscale, appliedShifts] = eels.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
 ```
 
@@ -31,14 +31,18 @@ Keyword | Equation | Literature reference
 'Poly2' | A*(x + m)^(-r-(c*x)) |
 'Linear' | A*x + t |
 
-```python
+```
 BkgModel = 'PL', 'Poly1', 'Poly2' or 'Linear'
-startBkg = Energy 
-endBkg = Energy
+startBkg = start of background window in eV
+endBkg = end of background window in eV
 (fitpara = Guess values to be used as starting parameters for the background fit)
 (fitbounds = upper and lower limit for the fitting parameters)
 Bkg_fit(EELSdata, EnergyValues, startBkg, endBkg, BkgModel, fitpara=None, fitbounds=None)
 ```
 
 ### Step 4 - Deconvolution of the signal:
-Two different concepts can be used to deconvolute the data. If the exact position of the edge is unknown (can't be determined exactly) the energy gaps between the spectra must be kept constants, while in some cases the position of the peaks changes.
+__Method 1:__
+Deconvolution of the spectra 
+
+__Method 2:__
+Energy window between the peaks is fixed, well suited for spectra where the ZLP data are not available and slight shifting of the peaks during the acquisition must be compensated.
