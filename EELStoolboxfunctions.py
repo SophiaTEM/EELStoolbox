@@ -82,7 +82,6 @@ def ZLPalignment(eelsSI, dispersion, ZLPmax, zlpSI=None, startLowLoss=None):
 
 
 def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbounds=None):
-    # ZLP correction
     def powerlaw(x, A, r):
         return A*np.power(x, -r)
 
@@ -91,7 +90,7 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
 
     def polyfitfunc2(x, A, m, r, c):
         return A*np.power((x + m), (-r-(c*x)))
-    
+
     def linearfunc(x, A, t):
         return A*x + t
 
@@ -102,7 +101,7 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
 
     start_Bkg2 = np.where(energy == find_nearest(energy, startBkg))
     end_Bkg2 = np.where(energy == find_nearest(energy, endBkg))
-        
+
     if np.shape(eelsSI_data.shape)[0] == 2:
         PowerLawFit = np.zeros([np.shape(eelsSI_data)[0], 2])
         Linear = np.zeros([np.shape(eelsSI_data)[0], 2])
@@ -122,25 +121,34 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                         continue
                 elif BkgModel == 'Poly1':
                     try:
-                        poptPoly, pcov = curve_fit(polyfitfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                        if fitbounds is not None:
+                            poptPoly, pcov = curve_fit(polyfitfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                        elif fitbounds is None:
+                            poptPoly, pcov = curve_fit(polyfitfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
                         PolyFit[i, :] = poptPoly[:]
                     except RuntimeError:
                         print("Error - curve_fit failed for datapoint " + str(i))
                         continue
                 elif BkgModel == 'Poly2':
                     try:
-                        poptPoly2, pcov = curve_fit(polyfitfunc2, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                        if fitbounds is not None:
+                            poptPoly2, pcov = curve_fit(polyfitfunc2, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                        elif fitbounds is None:
+                            poptPoly2, pcov = curve_fit(polyfitfunc2, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
                         Poly2Fit[i, :] = poptPoly2[:]
                     except RuntimeError:
                         print("Error - curve_fit failed for datapoint " + str(i))
                         continue
                 elif BkgModel == 'Linear':
                     try:
-                        poptLinear, pcov = curve_fit(linearfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                        if fitbounds is not None:
+                            poptLinear, pcov = curve_fit(linearfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                        elif fitbounds is None:
+                            poptLinear, pcov = curve_fit(linearfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
                         Linear[i, :] = poptLinear[:]
                     except RuntimeError:
                         print("Error - curve_fit failed for datapoint " + str(i))
-                        
+
         eelsSI_woBG = np.zeros([np.shape(eelsSI_data)[0], np.shape(energy)[0]-start_Bkg2[0][0], 1])
         eelsSI_woBG_energy = np.zeros([np.shape(energy)[0]-start_Bkg2[0][0], 1])
     
@@ -158,7 +166,7 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                         eelsSI_woBG[i, k, 0] = eelsSI_data[i, j] - linearfunc(energy[j], Linear[i, 0], Linear[i, 1])
                     eelsSI_woBG_energy[k, 0] = energy[j]
                     k = k + 1 
-                    
+
         eelsSI_woBG_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(energy)[0]-start_Bkg2[0][0], 1])
         eelsSI_woBG_smooth = np.zeros([np.shape(eelsSI_data)[0], np.shape(energy)[0]-start_Bkg2[0][0], 1])
         eelsSI_woBG_smooth_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(energy)[0]-start_Bkg2[0][0], 1])
@@ -167,7 +175,7 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
             eelsSI_woBG_zero[i, :, 0] = eelsSI_woBG[i, :, 0] - np.min(eelsSI_woBG[i, 0:end_Bkg2[0][0]-start_Bkg2[0][0], 0])
             eelsSI_woBG_smooth[i, :, 0] = savgol_filter(eelsSI_woBG[i, :, 0], 9, 2)
             eelsSI_woBG_smooth_zero[i, :, 0] = eelsSI_woBG_smooth[i, :, 0] - np.min(eelsSI_woBG_smooth[i, 0:end_Bkg2[0][0]-start_Bkg2[0][0], 0])
-     
+
     elif np.shape(eelsSI_data.shape)[0] == 3:  
         PowerLawFit = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], 2])
         Linear = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], 2])
@@ -184,7 +192,7 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                                 poptPL, pcov = curve_fit(powerlaw, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[i, j, start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
                             PowerLawFit[i, j, :] = poptPL[:]
                         except RuntimeError:
-                            print("Error - curve_fit failed for datapoint " + str(i) + '-' + str(j))
+                            print("Error - curve_fit failed for datapoint " + str(i))
                             continue
                     elif BkgModel == 'Poly1':
                         try:
@@ -218,23 +226,23 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
 
         eelsSI_woBG = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
         eelsSI_woBG_energy = np.zeros([np.shape(energy)[0]-start_Bkg2[0][0], 1])
-    
+
         for i in range(np.shape(eelsSI_data)[0]):
             for j in range(np.shape(eelsSI_data)[1]):
-                k = 0
                 if sum(eelsSI_data[i, j, :]) != 0:
+                    k = 0
                     for h in range(start_Bkg2[0][0], np.shape(energy)[0]):
                         if BkgModel == 'PL':
                             eelsSI_woBG[i, j, k] = eelsSI_data[i, j, h] - powerlaw(energy[h], PowerLawFit[i, j,  0], PowerLawFit[i, j, 1])
                         elif BkgModel == 'Poly1':
-                            eelsSI_woBG[i, j, k] = eelsSI_data[i, j, h] - polyfitfunc(energy[h], PolyFit[i, j, 0], PolyFit[i, 1], PolyFit[i, j, 2], PolyFit[i, j, 3])
+                            eelsSI_woBG[i, j, k] = eelsSI_data[i, j, h] - polyfitfunc(energy[h], PolyFit[i, j, 0], PolyFit[i, j, 1], PolyFit[i, j, 2], PolyFit[i, j, 3])
                         elif BkgModel == 'Poly2':
                             eelsSI_woBG[i, j, k] = eelsSI_data[i, j, h] - polyfitfunc2(energy[h], Poly2Fit[i, j, 0], Poly2Fit[i, j, 1], Poly2Fit[i, j, 2], Poly2Fit[i, j, 3])
                         elif BkgModel == 'Linear':
                             eelsSI_woBG[i, j, k] = eelsSI_data[i, j, h] - linearfunc(energy[h], Linear[i, j, 0], Linear[i, j, 1])
                         eelsSI_woBG_energy[k, 0] = energy[h]
                         k = k + 1 
-                
+
         eelsSI_woBG_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
         eelsSI_woBG_smooth = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
         eelsSI_woBG_smooth_zero = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], np.shape(energy)[0]-start_Bkg2[0][0], 1])
@@ -244,16 +252,17 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                 eelsSI_woBG_zero[i, j, :] = eelsSI_woBG[i, j, :] - np.min(eelsSI_woBG[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
                 eelsSI_woBG_smooth[i, j, :, 0] = savgol_filter(eelsSI_woBG[i, j, :, 0], 9, 2)
                 eelsSI_woBG_smooth_zero[i, j, :] = eelsSI_woBG_smooth[i, j, :] - np.min(eelsSI_woBG_smooth[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
-    
+
     return eelsSI_woBG, eelsSI_woBG_smooth, eelsSI_woBG_energy, eelsSI_woBG_zero, eelsSI_woBG_smooth_zero
+
 
 def SI_average(eelsSI, windowSize):
     eelsSI_averaged = np.zeros([np.shape(eelsSI)[0], np.shape(eelsSI)[1], np.shape(eelsSI)[2]])
 
     for i in range(np.shape(eelsSI)[0]-windowSize):
         for j in range(np.shape(eelsSI)[1]-windowSize):
-            eelsSI_averaged[i, j, :] = sum(sum(eelsSI[i : i+windowSize, j : j+windowSize, :]))
-    
+            eelsSI_averaged[i, j, :] = sum(sum(eelsSI[i:i + windowSize, j:j + windowSize, :]))
+
     return eelsSI_averaged
 
 
