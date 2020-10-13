@@ -1,4 +1,5 @@
 # EELStoolbox
+WORK IN PROGRESS
 Toolbox for the automated analysis of large EELS datasets e.g. time series or spectrum images. The toolbox comprises several steps and lets you choose between different alignment methods, background models and deconvolution models. I hope it can help you with the automation of your data analysis. I have tested several datasets, but I greatly appreachiate feedback about problems with your specific dataset so that I can adjust the functions accordingly. 
 
 ### Step 1 - Import dataset:
@@ -26,3 +27,5 @@ If your data do not contain the ZLP, but all contain the same edge (whose shape 
 ### Step 3 - Background correction:
 Different models to subtract the background from the EELS dataset are available. The powerlaw model works best for most high-loss edges, while the polynomial models fit low-loss data the best. The mathematic formulas are summarized in the following equation together with the respective literature reference.  
 
+### Step 4 - Deconvolution of the signal:
+Two different concepts can be used to deconvolute the data. If the exact position of the edge is unknown (can't be determined exactly) the energy gaps between the spectra must be kept constants, while in some cases the position of the peaks changes.
