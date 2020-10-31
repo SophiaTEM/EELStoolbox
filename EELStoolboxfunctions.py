@@ -175,6 +175,47 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
             eelsSI_woBG_zero[i, :, 0] = eelsSI_woBG[i, :, 0] - np.min(eelsSI_woBG[i, 0:end_Bkg2[0][0]-start_Bkg2[0][0], 0])
             eelsSI_woBG_smooth[i, :, 0] = savgol_filter(eelsSI_woBG[i, :, 0], 9, 2)
             eelsSI_woBG_smooth_zero[i, :, 0] = eelsSI_woBG_smooth[i, :, 0] - np.min(eelsSI_woBG_smooth[i, 0:end_Bkg2[0][0]-start_Bkg2[0][0], 0])
+        
+        if BkgModel == 'Poly1':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), :])
+            plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), 3]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), :])
+            plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), 3]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), :])
+            plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), 3]))    
+        elif BkgModel == 'Poly2':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), :])
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), 3]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), :])
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), 3]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), :])
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), 3]))
+        elif BkgModel == 'PL':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), :])
+            plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/2), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/2), 1]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), :])
+            plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/4), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/4), 1]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), :])
+            plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/1.5), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/1.5), 1]))
+        elif BkgModel == 'Linear':
+            plt.figure(1)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), :])
+            plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/2), 0], Linear[int(np.shape(eelsSI_woBG)[0]/2), 1]))
+            plt.figure(2)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), :])
+            plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/4), 0], Linear[int(np.shape(eelsSI_woBG)[0]/4), 1]))
+            plt.figure(3)
+            plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), :])
+            plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/1.5), 0], Linear[int(np.shape(eelsSI_woBG)[0]/1.5), 1]))      
 
     elif np.shape(eelsSI_data.shape)[0] == 3:  
         PowerLawFit = np.zeros([np.shape(eelsSI_data)[0], np.shape(eelsSI_data)[1], 2])
@@ -254,65 +295,158 @@ def Bkg_fit(eelsSI_data, energy, startBkg, endBkg, BkgModel, fitpara=None, fitbo
                 eelsSI_woBG_smooth_zero[i, j, :] = eelsSI_woBG_smooth[i, j, :] - np.min(eelsSI_woBG_smooth[i, j, 0:end_Bkg2[0][0]-start_Bkg2[0][0]])
 
         if BkgModel == 'Poly1':
+            Parameters = PolyFit
             plt.figure(1)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
             plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 3]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(2)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
             plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 3]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(3)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
             plt.plot(energy[:], polyfitfunc(energy[:], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 2], PolyFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 3]))    
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
         elif BkgModel == 'Poly2':
+            Parameters = Poly2Fit
             plt.figure(1)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
-            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/2), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 3]))
+            plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 3]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(2)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
             plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 3]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(3)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
             plt.plot(energy[:], polyfitfunc2(energy[:], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 2], Poly2Fit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 3]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
         elif BkgModel == 'PL':
+            Parameters = PowerLawFit
             plt.figure(1)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
             plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(2)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
             plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(3)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
             plt.plot(energy[:], powerlaw(energy[:], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], PowerLawFit[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
         elif BkgModel == 'Linear':
+            Parameters = Linear
             plt.figure(1)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), :])
             plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 0], Linear[int(np.shape(eelsSI_woBG)[0]/2), int(np.shape(eelsSI_woBG)[1]/2), 1]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(2)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), :])
             plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 0], Linear[int(np.shape(eelsSI_woBG)[0]/4), int(np.shape(eelsSI_woBG)[1]/4), 1]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
             plt.figure(3)
             plt.plot(energy[:], eelsSI_data[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), :])
             plt.plot(energy[:], linearfunc(energy[:], Linear[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 0], Linear[int(np.shape(eelsSI_woBG)[0]/1.5), int(np.shape(eelsSI_woBG)[1]/1.5), 1]))
+            plt.xlim([start_Bkg2[0][0], end_Bkg2[0][0]+200])
+    
+    else:
+        PowerLawFit = np.zeros(2)
+        Linear = np.zeros(2)
+        PolyFit = np.zeros(4)
+        Poly2Fit = np.zeros(4)
+        if sum(eelsSI_data) != 0:
+            if BkgModel == 'PL':
+                try:
+                    if fitbounds is not None:
+                        poptPL, pcov = curve_fit(powerlaw, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                    elif fitbounds is None:
+                        poptPL, pcov = curve_fit(powerlaw, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
+                    PowerLawFit[:] = poptPL[:]
+                except RuntimeError:
+                    print("Error - curve_fit failed for spectrum.")
+            elif BkgModel == 'Poly1':
+                try:
+                    if fitbounds is not None:
+                        poptPoly, pcov = curve_fit(polyfitfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                    elif fitbounds is None:
+                        poptPoly, pcov = curve_fit(polyfitfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
+                    PolyFit[:] = poptPoly[:]
+                except RuntimeError:
+                    print("Error - curve_fit failed for spectrum.")
+            elif BkgModel == 'Poly2':
+                try:
+                    if fitbounds is not None:
+                        poptPoly2, pcov = curve_fit(polyfitfunc2, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                    elif fitbounds is None:
+                        poptPoly2, pcov = curve_fit(polyfitfunc2, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
+                    Poly2Fit[:] = poptPoly2[:]
+                except RuntimeError:
+                    print("Error - curve_fit failed for spectrum.")
+            elif BkgModel == 'Linear':
+                try:
+                    if fitbounds is not None:
+                        poptLinear, pcov = curve_fit(linearfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, bounds=fitbounds, maxfev=8000)
+                    elif fitbounds is None:
+                        poptLinear, pcov = curve_fit(linearfunc, energy[start_Bkg2[0][0]:end_Bkg2[0][0]], eelsSI_data[start_Bkg2[0][0]:end_Bkg2[0][0]], p0=fitpara, maxfev=8000)
+                    Linear[:] = poptLinear[:]
+                except RuntimeError:
+                    print("Error - curve_fit failed for spectrum.")
 
-    return eelsSI_woBG, eelsSI_woBG_smooth, eelsSI_woBG_energy, eelsSI_woBG_zero, eelsSI_woBG_smooth_zero
+        eelsSI_woBG = np.zeros([np.shape(energy)[0]-start_Bkg2[0][0], 1])
+        eelsSI_woBG_energy = np.zeros([np.shape(energy)[0]-start_Bkg2[0][0], 1])
+    
+        k = 0
+        if sum(eelsSI_data) != 0:
+            for j in range(start_Bkg2[0][0], np.shape(energy)[0]):
+                if BkgModel == 'PL':
+                    eelsSI_woBG[k, 0] = eelsSI_data[j] - powerlaw(energy[j], PowerLawFit[0], PowerLawFit[1])
+                    Parameters = PowerLawFit
+                elif BkgModel == 'Poly1':
+                    eelsSI_woBG[k, 0] = eelsSI_data[j] - polyfitfunc(energy[j], PolyFit[0], PolyFit[1], PolyFit[2], PolyFit[3])
+                    Parameters = PolyFit
+                elif BkgModel == 'Poly2':
+                    Parameters = Poly2Fit
+                    eelsSI_woBG[k, 0] = eelsSI_data[j] - polyfitfunc2(energy[j], Poly2Fit[0], Poly2Fit[1], Poly2Fit[2], Poly2Fit[3])
+                elif BkgModel == 'Linear':
+                    Parameters = Linear
+                    eelsSI_woBG[k, 0] = eelsSI_data[j] - linearfunc(energy[j], Linear[0], Linear[1])
+                eelsSI_woBG_energy[k, 0] = energy[j]
+                k = k + 1 
+
+        eelsSI_woBG_zero = eelsSI_woBG[:, 0] - np.min(eelsSI_woBG[0:end_Bkg2[0][0]-start_Bkg2[0][0]])
+        eelsSI_woBG_smooth = savgol_filter(eelsSI_woBG[:, 0], 9, 2)
+        eelsSI_woBG_smooth_zero = eelsSI_woBG_smooth[:] - np.min(eelsSI_woBG_smooth[0:end_Bkg2[0][0]-start_Bkg2[0][0]])
+
+            
+    return eelsSI_woBG, eelsSI_woBG_energy, Parameters#, eelsSI_woBG_smooth, eelsSI_woBG_zero, eelsSI_woBG_smooth_zero
 
 
-def SI_average(eelsSI, windowSize):
-    eelsSI_averaged = np.zeros([np.shape(eelsSI)[0], np.shape(eelsSI)[1], np.shape(eelsSI)[2]])
-
-    for i in range(np.shape(eelsSI)[0]-windowSize):
-        for j in range(np.shape(eelsSI)[1]-windowSize):
-            eelsSI_averaged[i, j, :] = sum(sum(eelsSI[i:i + windowSize, j:j + windowSize, :]))
+def SI_average(eelsSI, windowSizeX, windowSizeY):
+    if np.shape(eelsSI)[0]-windowSizeX == 0:
+        eelsSI_averaged = np.zeros([np.shape(eelsSI)[1]-windowSizeY, np.shape(eelsSI)[2]])
+        for j in range(np.shape(eelsSI)[1]-windowSizeY):
+            eelsSI_averaged[j, :] = sum(sum(eelsSI[:, j:j + windowSizeY, :]))
+    elif np.shape(eelsSI)[1]-windowSizeY == 0:
+        eelsSI_averaged = np.zeros([np.shape(eelsSI)[0]-windowSizeX, np.shape(eelsSI)[2]])
+        for i in range(np.shape(eelsSI)[0]-windowSizeX):
+            eelsSI_averaged[i, :] = sum(sum(eelsSI[i:i + windowSizeX, :, :]))
+    else:
+        eelsSI_averaged = np.zeros([np.shape(eelsSI)[0]-windowSizeX, np.shape(eelsSI)[1]-windowSizeY, np.shape(eelsSI)[2]])
+        for i in range(np.shape(eelsSI)[0]-windowSizeX):
+            for j in range(np.shape(eelsSI)[1]-windowSizeY):
+                eelsSI_averaged[i, j, :] = sum(sum(eelsSI[i:i + windowSizeX, j:j + windowSizeY, :]))
 
     return eelsSI_averaged
 
 
-def peak_deconvolution_flexible(eels_SI_woBG, energy, SIregion1, SIregion2, startFit, endFit, peak_number, fitParaStart=None, fitParaBounds=None):
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
 
-    def find_nearest(array, value):
-        array = np.asarray(array)
-        idx = (np.abs(array - value)).argmin()
-        return array[idx]
+def peak_deconvolution_flexible(eels_SI_woBG, energy, SIregion1, SIregion2, startFit, endFit, peak_number, fitParaStart=None, fitParaBounds=None):
 
     start_Fit2 = np.where(energy == find_nearest(energy, startFit))
     end_Fit2 = np.where(energy == find_nearest(energy, endFit))
@@ -333,91 +467,180 @@ def peak_deconvolution_flexible(eels_SI_woBG, energy, SIregion1, SIregion2, star
                 amp4*(1/(sigma4*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-cen4)/sigma4)**2))) + \
                 amp5*(1/(sigma5*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-cen5)/sigma5)**2)))
 
-    pars_1 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
-    pars_2 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
-    pars_3 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
-    pars_4 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
-    pars_5 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
-
-    gauss_peak = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0], 5])
-    sumspec = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0]])
-
-    if peak_number == 4:
-        parameters = np.zeros([np.shape(eels_SI_woBG)[0], 12])
-        for i in range(SIregion1, SIregion2):
-            if sum(eels_SI_woBG[i, :]) != 0:
-                if fitParaBounds is not None:
-                    try:
-                        popt_fit, pcov_fit = spy.optimize.curve_fit(_fit4G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, bounds=fitParaBounds, maxfev=8000)
-                    except RuntimeError:
-                        print('Fit did not converge for spectrum ' + str(i))
-                        popt_fit = np.zeros(12)
-                        pcov_fit = None
-                else:
-                    try:
-                        popt_fit, pcov_fit = spy.optimize.curve_fit(_fit4G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, maxfev=8000)
-                    except RuntimeError:
-                        print('Fit did not converge for spectrum ' + str(i))
-                        popt_fit = np.zeros(12)
-                        pcov_fit = None
-                pars_1[i] = popt_fit[0:3]
-                pars_2[i] = popt_fit[3:6]
-                pars_3[i] = popt_fit[6:9]
-                pars_4[i] = popt_fit[9:12]
-                parameters[i, :] = popt_fit
-                gauss_peak[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_1[i])
-                gauss_peak[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_2[i])
-                gauss_peak[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_3[i])
-                gauss_peak[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_4[i])
-                sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3]
-                del popt_fit, pcov_fit
-                #except ValueError:
-                 #   print('Deconvolution was not successful for spectrum ' + str(i))
-    if peak_number == 5:
-        parameters = np.zeros([np.shape(eels_SI_woBG)[0], 15])
-        for i in range(SIregion1, SIregion2):
-            if sum(eels_SI_woBG[i, :]) != 0:
-                if fitParaBounds is not None:
-                    try:
-                        popt_fit, pcov_fit = spy.optimize.curve_fit(_fit5G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, bounds=fitParaBounds, maxfev=8000)
-                    except RuntimeError:
-                        print('Fit did not converge for spectrum ' + str(i))
-                        popt_fit = np.zeros(15)
-                        pcov_fit = None
-                else:
-                    try:
-                        popt_fit, pcov_fit = spy.optimize.curve_fit(_fit5G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, maxfev=8000)
-                    except RuntimeError:
-                        print('Fit did not converge for spectrum ' + str(i))
-                        popt_fit = np.zeros(15)
-                        pcov_fit = None
-                pars_1[i] = popt_fit[0:3]
-                pars_2[i] = popt_fit[3:6]
-                pars_3[i] = popt_fit[6:9]
-                pars_4[i] = popt_fit[9:12]
-                pars_5[i] = popt_fit[12:15]
-                parameters[i, :] = popt_fit
-                gauss_peak[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_1[i])
-                gauss_peak[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_2[i])
-                gauss_peak[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_3[i])
-                gauss_peak[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_4[i])
-                gauss_peak[i, :, 4] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_5[i])
-                sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3] + gauss_peak[i, :, 4]
-                del popt_fit, pcov_fit
+    if len(np.shape(eels_SI_woBG)) == 3:
+        if peak_number == 4:
+            pars_1 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_2 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_3 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_4 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+        
+            gauss_peak = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0], 4])
+            sumspec = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0]])
+            parameters = np.zeros([np.shape(eels_SI_woBG)[0], 12])
+            for i in range(SIregion1, SIregion2):
+                if sum(eels_SI_woBG[i, :]) != 0:
+                    if fitParaBounds is not None:
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit4G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, bounds=fitParaBounds, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(12)
+                            pcov_fit = None
+                    else:
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit4G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(12)
+                            pcov_fit = None
+                    pars_1[i] = popt_fit[0:3]
+                    pars_2[i] = popt_fit[3:6]
+                    pars_3[i] = popt_fit[6:9]
+                    pars_4[i] = popt_fit[9:12]
+                    parameters[i, :] = popt_fit
+                    gauss_peak[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_1[i])
+                    gauss_peak[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_2[i])
+                    gauss_peak[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_3[i])
+                    gauss_peak[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_4[i])
+                    sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3]
+                    del popt_fit, pcov_fit
+                    #except ValueError:
+                     #   print('Deconvolution was not successful for spectrum ' + str(i))
+        if peak_number == 5:
+            pars_1 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_2 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_3 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_4 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_5 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+        
+            gauss_peak = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0], 5])
+            sumspec = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0]])
+            parameters = np.zeros([np.shape(eels_SI_woBG)[0], 15])
+            for i in range(SIregion1, SIregion2):
+                if sum(eels_SI_woBG[i, :]) != 0:
+                    if fitParaBounds is not None:
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit5G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, bounds=fitParaBounds, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(15)
+                            pcov_fit = None
+                    else:
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit5G, energy[start_Fit2[0][0]:end_Fit2[0][0], 0], eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0], 0], p0=fitParaStart, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(15)
+                            pcov_fit = None
+                    pars_1[i] = popt_fit[0:3]
+                    pars_2[i] = popt_fit[3:6]
+                    pars_3[i] = popt_fit[6:9]
+                    pars_4[i] = popt_fit[9:12]
+                    pars_5[i] = popt_fit[12:15]
+                    parameters[i, :] = popt_fit
+                    gauss_peak[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_1[i])
+                    gauss_peak[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_2[i])
+                    gauss_peak[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_3[i])
+                    gauss_peak[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_4[i])
+                    gauss_peak[i, :, 4] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0], 0], *pars_5[i])
+                    sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3] + gauss_peak[i, :, 4]
+                    del popt_fit, pcov_fit
+    if len(np.shape(eels_SI_woBG)) == 2:
+        if peak_number == 4:
+            pars_1 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_2 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_3 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_4 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+        
+            gauss_peak = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0], 4])
+            sumspec = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0]])
+            parameters = np.zeros([np.shape(eels_SI_woBG)[0], 12])
+            for i in range(SIregion1, SIregion2):
+                if sum(eels_SI_woBG[i, :]) != 0:
+                    if fitParaBounds is not None:
+                        eels_SI_norm = (eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]]-np.min(eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]]))/(np.max(eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]])-np.min(eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]]))
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit4G, energy[start_Fit2[0][0]:end_Fit2[0][0]], eels_SI_norm, p0=fitParaStart, bounds=fitParaBounds, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(12)
+                            pcov_fit = None
+                    else:
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit4G, energy[start_Fit2[0][0]:end_Fit2[0][0]], eels_SI_norm, p0=fitParaStart, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(12)
+                            pcov_fit = None
+                    pars_1[i] = popt_fit[0:3]
+                    pars_2[i] = popt_fit[3:6]
+                    pars_3[i] = popt_fit[6:9]
+                    pars_4[i] = popt_fit[9:12]
+                    parameters[i, :] = popt_fit
+                    gauss_peak[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_1[i])
+                    gauss_peak[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_2[i])
+                    gauss_peak[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_3[i])
+                    gauss_peak[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_4[i])
+                    sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3]
+                    del popt_fit, pcov_fit
+                    #except ValueError:
+                     #   print('Deconvolution was not successful for spectrum ' + str(i))
+        if peak_number == 5:
+            pars_1 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_2 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_3 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_4 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+            pars_5 = np.zeros([np.shape(eels_SI_woBG)[0], 3])
+        
+            gauss_peak = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0], 5])
+            sumspec = np.zeros([np.shape(eels_SI_woBG)[0], end_Fit2[0][0] - start_Fit2[0][0]])
+            parameters = np.zeros([np.shape(eels_SI_woBG)[0], 15])
+            for i in range(SIregion1, SIregion2):
+                if sum(eels_SI_woBG[i, :]) != 0:
+                    if fitParaBounds is not None:
+                        eels_SI_norm = (eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]]-np.min(eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]]))/(np.max(eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]])-np.min(eels_SI_woBG[i, start_Fit2[0][0]:end_Fit2[0][0]]))
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit5G, energy[start_Fit2[0][0]:end_Fit2[0][0]], eels_SI_norm, p0=fitParaStart, bounds=fitParaBounds, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(15)
+                            pcov_fit = None
+                    else:
+                        try:
+                            popt_fit, pcov_fit = spy.optimize.curve_fit(_fit5G, energy[start_Fit2[0][0]:end_Fit2[0][0]], eels_SI_norm, p0=fitParaStart, maxfev=8000)
+                        except RuntimeError:
+                            print('Fit did not converge for spectrum ' + str(i))
+                            popt_fit = np.zeros(15)
+                            pcov_fit = None
+                    pars_1[i] = popt_fit[0:3]
+                    pars_2[i] = popt_fit[3:6]
+                    pars_3[i] = popt_fit[6:9]
+                    pars_4[i] = popt_fit[9:12]
+                    pars_5[i] = popt_fit[12:15]
+                    parameters[i, :] = popt_fit
+                    gauss_peak[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_1[i])
+                    gauss_peak[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_2[i])
+                    gauss_peak[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_3[i])
+                    gauss_peak[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_4[i])
+                    gauss_peak[i, :, 4] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *pars_5[i])
+                    sumspec[i, :] = gauss_peak[i, :, 0] + gauss_peak[i, :, 1] + gauss_peak[i, :, 2] + gauss_peak[i, :, 3] + gauss_peak[i, :, 4]
+                    del popt_fit, pcov_fit
 
     return sumspec, parameters, gauss_peak
 
 
-def signal_intensity(eelsSI, startEnergy, endEnergy):
+def signal_intensity(eelsSI, energy, startEnergy, endEnergy):
+    start_Integral = np.where(energy == find_nearest(energy, startEnergy))
+    end_Integral = np.where(energy == find_nearest(energy, endEnergy))
     if np.shape(eelsSI.shape)[0] >= 3:
         eelsIntensity = np.zeros([np.shape(eelsSI)[0], np.shape(eelsSI)[1]])
         for i in range(np.shape(eelsSI)[0]):
             for j in range(np.shape(eelsSI)[1]):
-                eelsIntensity[i, j] = sum(eelsSI[i, j])
+                eelsIntensity[i, j] = sum(eelsSI[i, j, start_Integral[0][0]:end_Integral[0][0]])[0]
     elif np.shape(eelsSI)[0] == 2:
         eelsIntensity = np.zeros([np.shape(eelsSI)[0], 1])
         for i in range(np.shape(eelsSI)[0]):
-            eelsIntensity[i] = sum(eelsSI[i])
+            eelsIntensity[i] = sum(eelsSI[i, start_Integral[0][0]:end_Integral[0][0]])[0]
 
     return eelsIntensity
 
