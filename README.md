@@ -14,7 +14,7 @@ If your spectra contain the zero-loss peak (ZLP) you can directly use the ZLP to
 ```
 
 __Method 2:__
-If you recorded the spectra in Dual-Imaging mode you can use the ZLP spectra to align your high-loss data.
+If you recorded the spectra in Dual-EELS mode you can use the ZLP spectra to align your high-loss data.
 ```
 [EELSaligned, energyscale, appliedShifts] = eels.ZLPalignment(EELSdata, Dispersion, IntensityZLP)
 ```
@@ -40,4 +40,4 @@ __Method 1:__
 Deconvolution of the spectra 
 
 __Method 2:__
-Energy window between the peaks is fixed, well suited for spectra where the ZLP data are not available and slight shifting of the peaks during the acquisition must be compensated.
+Energy window between the peaks is fixed, well suited for spectra where the ZLP data are not available and slight shifting of the peaks during the acquisition must be compensated. Doesn't currently work for spectrum images, but I will add this functionality as soon as possible.
