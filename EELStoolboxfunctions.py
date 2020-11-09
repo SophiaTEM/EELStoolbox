@@ -18,6 +18,7 @@ import pandas as pd
 import warnings
 from scipy.optimize import OptimizeWarning
 warnings.simplefilter("error", OptimizeWarning)
+from lmfit import Model
 
 
 def ZLPalignment(eelsSI, dispersion, ZLPmax, zlpSI=None, startLowLoss=None):
@@ -627,6 +628,348 @@ def peak_deconvolution_flexible(eels_SI_woBG, energy, SIregion1, SIregion2, star
                     del popt_fit, pcov_fit
 
     return sumspec, parameters, gauss_peak
+
+def peak_deconvolution_fixed(TimeSeries, energy, TSregion1, TSregion2, startFit, endFit, peak_number, PksPos, fit_guess, fit_bounds):
+ 
+    def find_nearest(array, value):
+        array = np.asarray(array)
+        idx = (np.abs(array - value)).argmin()
+        return array[idx]
+
+    if np.shape(PksPos)[0] != peak_number or np.shape(fit_guess)[0] != peak_number*2+1 or np.shape(fit_bounds)[1] != peak_number*2+1:
+        print('Make sure that you provide enough values for the peak position, guess of the fit parameters and bounds of the fit parameters!')
+        return None
+    
+    start_Fit2 = np.where(energy == find_nearest(energy, startFit))
+    end_Fit2 = np.where(energy == find_nearest(energy, endFit))
+    GaussFit = np.zeros([np.shape(TimeSeries)[0], end_Fit2[0][0]-start_Fit2[0][0], peak_number])
+    Parameter = np.zeros([np.shape(TimeSeries)[0], peak_number*3])
+    SumSpec = np.zeros([np.shape(TimeSeries)[0], end_Fit2[0][0]-start_Fit2[0][0]])
+
+    def _1gaussian(x, cen1, amp1, sigma1):
+        return amp1*(1/(sigma1*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-cen1)/sigma1)**2)))
+
+    def _fit2G(x, PksPos1, PksPos2, cen, amp1, sigma1, amp2, sigma2):
+        return amp1*(1/(sigma1*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos1))/sigma1)**2))) + \
+                amp2*(1/(sigma2*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos2))/sigma2)**2))) 
+        
+    def _fit3G(x, PksPos1, PksPos2, PksPos3, cen, amp1, sigma1, amp2, sigma2, amp3, sigma3):
+        return amp1*(1/(sigma1*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos1))/sigma1)**2))) + \
+                amp2*(1/(sigma2*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos2))/sigma2)**2))) + \
+                amp3*(1/(sigma3*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos3))/sigma3)**2))) 
+
+    def _fit4G(x, PksPos1, PksPos2, PksPos3, PksPos4, cen, amp1, sigma1, amp2, sigma2, amp3, sigma3, amp4, sigma4):
+        return amp1*(1/(sigma1*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos1))/sigma1)**2))) + \
+                amp2*(1/(sigma2*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos2))/sigma2)**2))) + \
+                amp3*(1/(sigma3*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos3))/sigma3)**2))) + \
+                amp4*(1/(sigma4*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos4))/sigma4)**2)))
+
+    def _fit5G(x, PksPos1, PksPos2, PksPos3, PksPos4, PksPos5, cen, amp1, sigma1, amp2, sigma2, amp3, sigma3, amp4, sigma4, amp5, sigma5):
+        return amp1*(1/(sigma1*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos1))/sigma1)**2))) + \
+                amp2*(1/(sigma2*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos2))/sigma2)**2))) + \
+                amp3*(1/(sigma3*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos3))/sigma3)**2))) + \
+                amp4*(1/(sigma4*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos4))/sigma4)**2))) + \
+                amp5*(1/(sigma5*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos5))/sigma5)**2)))
+
+    def _fit6G(x, PksPos1, PksPos2, PksPos3, PksPos4, PksPos5, PksPos6, cen, amp1, sigma1, amp2, sigma2, amp3, sigma3, amp4, sigma4, amp5, sigma5, amp6, sigma6):
+        return amp1*(1/(sigma1*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos1))/sigma1)**2))) + \
+                amp2*(1/(sigma2*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos2))/sigma2)**2))) + \
+                amp3*(1/(sigma3*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos3))/sigma3)**2))) + \
+                amp4*(1/(sigma4*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos4))/sigma4)**2))) + \
+                amp5*(1/(sigma5*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos5))/sigma5)**2))) + \
+                amp6*(1/(sigma6*(np.sqrt(2*np.pi))))*(np.exp((-1.0/2.0)*(((x-(cen+PksPos6))/sigma6)**2))) 
+
+    if peak_number == 2:
+        for i in range(TSregion1, TSregion2):
+            if sum(TimeSeries[i, :]) != 0:
+                try:
+                    fmodel = Model(_fit2G)
+                    params = fmodel.make_params(PksPos1=PksPos[0], PksPos2=PksPos[1], PksPos3=PksPos[2], PksPos4=PksPos[3],
+                             cen=fit_guess[0],
+                             amp1=fit_guess[1], amp2=fit_guess[2], amp3=fit_guess[3], amp4=fit_guess[4],
+                             sigma1=fit_guess[5], sigma2=fit_guess[6], sigma3=fit_guess[7], sigma4=fit_guess[8])
+                    params['PksPos1'].vary = False
+                    params['PksPos2'].vary = False
+                    params['cen'].min = fit_bounds[0][0]
+                    params['cen'].max = fit_bounds[1][0]
+                    params['amp1'].min = fit_bounds[0][1]
+                    params['amp1'].max = fit_bounds[1][1]
+                    params['amp2'].min = fit_bounds[0][2]
+                    params['amp2'].max = fit_bounds[1][1]
+                    params['sigma1'].min = fit_bounds[0][5]
+                    params['sigma1'].max = fit_bounds[1][5]
+                    params['sigma2'].min = fit_bounds[0][6]
+                    params['sigma2'].max = fit_bounds[1][6]
+
+                    result = fmodel.fit(TimeSeries[i, start_Fit2[0][0]:end_Fit2[0][0]], params, x=energy[start_Fit2[0][0]:end_Fit2[0][0]])
+
+                    Parameter[i, 0] = result.params['cen'].value + PksPos[0]
+                    Parameter[i, 1] = result.params['amp1'].value
+                    Parameter[i, 2] = result.params['sigma1'].value
+                    Parameter[i, 3] = result.params['cen'].value + PksPos[1]
+                    Parameter[i, 4] = result.params['amp2'].value
+                    Parameter[i, 5] = result.params['sigma2'].value
+
+                    GaussFit[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 0:3])
+                    GaussFit[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 3:6])
+
+                    SumSpec[i, :] = GaussFit[i, :, 0] + GaussFit[i, :, 1]
+                    del result
+                except RuntimeError:
+                    print("Error - deconvolution failed")
+                    continue
+
+    if peak_number == 3:
+        for i in range(TSregion1, TSregion2):
+            if sum(TimeSeries[i, :]) != 0:
+                try:
+                    fmodel = Model(_fit3G)
+                    params = fmodel.make_params(PksPos1=PksPos[0], PksPos2=PksPos[1], PksPos3=PksPos[2],
+                             cen=fit_guess[0],
+                             amp1=fit_guess[1], amp2=fit_guess[2], amp3=fit_guess[3],
+                             sigma1=fit_guess[4], sigma2=fit_guess[5], sigma3=fit_guess[6])
+                    params['PksPos1'].vary = False
+                    params['PksPos2'].vary = False
+                    params['PksPos3'].vary = False
+                    params['cen'].min = fit_bounds[0][0]
+                    params['cen'].max = fit_bounds[1][0]
+                    params['amp1'].min = fit_bounds[0][1]
+                    params['amp1'].max = fit_bounds[1][1]
+                    params['amp2'].min = fit_bounds[0][2]
+                    params['amp2'].max = fit_bounds[1][1]
+                    params['amp3'].min = fit_bounds[0][3]
+                    params['amp3'].max = fit_bounds[1][3]
+                    params['sigma1'].min = fit_bounds[0][4]
+                    params['sigma1'].max = fit_bounds[1][4]
+                    params['sigma2'].min = fit_bounds[0][5]
+                    params['sigma2'].max = fit_bounds[1][5]
+                    params['sigma3'].min = fit_bounds[0][6]
+                    params['sigma3'].max = fit_bounds[1][6]
+
+                    result = fmodel.fit(TimeSeries[i, start_Fit2[0][0]:end_Fit2[0][0]], params, x=energy[start_Fit2[0][0]:end_Fit2[0][0]])
+
+                    Parameter[i, 0] = result.params['cen'].value + PksPos[0]
+                    Parameter[i, 1] = result.params['amp1'].value
+                    Parameter[i, 2] = result.params['sigma1'].value
+                    Parameter[i, 3] = result.params['cen'].value + PksPos[1]
+                    Parameter[i, 4] = result.params['amp2'].value
+                    Parameter[i, 5] = result.params['sigma2'].value
+                    Parameter[i, 6] = result.params['cen'].value + PksPos[2]
+                    Parameter[i, 7] = result.params['amp3'].value
+                    Parameter[i, 8] = result.params['sigma3'].value
+
+                    GaussFit[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 0:3])
+                    GaussFit[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 3:6])
+                    GaussFit[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 6:9])
+
+                    SumSpec[i, :] = GaussFit[i, :, 0] + GaussFit[i, :, 1] + GaussFit[i, :, 2]
+                    del result
+                except RuntimeError:
+                    print("Error - deconvolution failed")
+                    continue   
+
+    if peak_number == 4:
+        for i in range(TSregion1, TSregion2):
+            if sum(TimeSeries[i, :]) != 0:
+                try:
+                    fmodel = Model(_fit4G)
+                    params = fmodel.make_params(PksPos1=PksPos[0], PksPos2=PksPos[1], PksPos3=PksPos[2], PksPos4=PksPos[3],
+                             cen=fit_guess[0],
+                             amp1=fit_guess[1], amp2=fit_guess[2], amp3=fit_guess[3], amp4=fit_guess[4],
+                             sigma1=fit_guess[5], sigma2=fit_guess[6], sigma3=fit_guess[7], sigma4=fit_guess[8])
+                    params['PksPos1'].vary = False
+                    params['PksPos2'].vary = False
+                    params['PksPos3'].vary = False
+                    params['PksPos4'].vary = False
+                    params['cen'].min = fit_bounds[0][0]
+                    params['cen'].max = fit_bounds[1][0]
+                    params['amp1'].min = fit_bounds[0][1]
+                    params['amp1'].max = fit_bounds[1][1]
+                    params['amp2'].min = fit_bounds[0][2]
+                    params['amp2'].max = fit_bounds[1][1]
+                    params['amp3'].min = fit_bounds[0][3]
+                    params['amp3'].max = fit_bounds[1][3]
+                    params['amp4'].min = fit_bounds[0][4]
+                    params['amp4'].max = fit_bounds[1][4]
+                    params['sigma1'].min = fit_bounds[0][5]
+                    params['sigma1'].max = fit_bounds[1][5]
+                    params['sigma2'].min = fit_bounds[0][6]
+                    params['sigma2'].max = fit_bounds[1][6]
+                    params['sigma3'].min = fit_bounds[0][7]
+                    params['sigma3'].max = fit_bounds[1][7]
+                    params['sigma4'].min = fit_bounds[0][8]
+                    params['sigma4'].max = fit_bounds[1][8]
+
+                    result = fmodel.fit(TimeSeries[i, start_Fit2[0][0]:end_Fit2[0][0]], params, x=energy[start_Fit2[0][0]:end_Fit2[0][0]])
+
+                    Parameter[i, 0] = result.params['cen'].value + PksPos[0]
+                    Parameter[i, 1] = result.params['amp1'].value
+                    Parameter[i, 2] = result.params['sigma1'].value
+                    Parameter[i, 3] = result.params['cen'].value + PksPos[1]
+                    Parameter[i, 4] = result.params['amp2'].value
+                    Parameter[i, 5] = result.params['sigma2'].value
+                    Parameter[i, 6] = result.params['cen'].value + PksPos[2]
+                    Parameter[i, 7] = result.params['amp3'].value
+                    Parameter[i, 8] = result.params['sigma3'].value
+                    Parameter[i, 9] = result.params['cen'].value + PksPos[3]
+                    Parameter[i, 10] = result.params['amp4'].value
+                    Parameter[i, 11] = result.params['sigma4'].value
+
+                    GaussFit[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 0:3])
+                    GaussFit[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 3:6])
+                    GaussFit[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 6:9])
+                    GaussFit[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 9:12])
+
+                    SumSpec[i, :] = GaussFit[i, :, 0] + GaussFit[i, :, 1] + GaussFit[i, :, 2] + GaussFit[i, :, 3]
+                    del result
+                except RuntimeError:
+                    print("Error - deconvolution failed")
+                    continue    
+
+    if peak_number == 5:
+        for i in range(TSregion1, TSregion2):
+            if sum(TimeSeries[i, :]) != 0:
+                try:
+                    fmodel = Model(_fit5G)
+                    params = fmodel.make_params(PksPos1=PksPos[0], PksPos2=PksPos[1], PksPos3=PksPos[2], PksPos4=PksPos[3], PksPos5=PksPos[4],
+                             cen=fit_guess[0],
+                             amp1=fit_guess[1], amp2=fit_guess[2], amp3=fit_guess[3], amp4=fit_guess[4], amp5=fit_guess[5],
+                             sigma1=fit_guess[6], sigma2=fit_guess[7], sigma3=fit_guess[8], sigma4=fit_guess[9], sigma5=fit_guess[10])
+                    params['PksPos1'].vary = False
+                    params['PksPos2'].vary = False
+                    params['PksPos3'].vary = False
+                    params['PksPos4'].vary = False
+                    params['PksPos5'].vary = False
+                    params['cen'].min = fit_bounds[0][0]
+                    params['cen'].max = fit_bounds[1][0]
+                    params['amp1'].min = fit_bounds[0][1]
+                    params['amp1'].max = fit_bounds[1][1]
+                    params['amp2'].min = fit_bounds[0][2]
+                    params['amp2'].max = fit_bounds[1][1]
+                    params['amp3'].min = fit_bounds[0][3]
+                    params['amp3'].max = fit_bounds[1][3]
+                    params['amp4'].min = fit_bounds[0][4]
+                    params['amp4'].max = fit_bounds[1][4]
+                    params['amp5'].min = fit_bounds[0][5]
+                    params['amp5'].max = fit_bounds[1][5]
+                    params['sigma1'].min = fit_bounds[0][6]
+                    params['sigma1'].max = fit_bounds[1][6]
+                    params['sigma2'].min = fit_bounds[0][7]
+                    params['sigma2'].max = fit_bounds[1][7]
+                    params['sigma3'].min = fit_bounds[0][8]
+                    params['sigma3'].max = fit_bounds[1][8]
+                    params['sigma4'].min = fit_bounds[0][9]
+                    params['sigma4'].max = fit_bounds[1][9]
+                    params['sigma5'].min = fit_bounds[0][10]
+                    params['sigma5'].max = fit_bounds[1][10]
+
+                    result = fmodel.fit(TimeSeries[i, start_Fit2[0][0]:end_Fit2[0][0]], params, x=energy[start_Fit2[0][0]:end_Fit2[0][0]])
+
+                    Parameter[i, 0] = result.params['cen'].value + PksPos[0]
+                    Parameter[i, 1] = result.params['amp1'].value
+                    Parameter[i, 2] = result.params['sigma1'].value
+                    Parameter[i, 3] = result.params['cen'].value + PksPos[1]
+                    Parameter[i, 4] = result.params['amp2'].value
+                    Parameter[i, 5] = result.params['sigma2'].value
+                    Parameter[i, 6] = result.params['cen'].value + PksPos[2]
+                    Parameter[i, 7] = result.params['amp3'].value
+                    Parameter[i, 8] = result.params['sigma3'].value
+                    Parameter[i, 9] = result.params['cen'].value + PksPos[3]
+                    Parameter[i, 10] = result.params['amp4'].value
+                    Parameter[i, 11] = result.params['sigma4'].value
+                    Parameter[i, 12] = result.params['cen'].value + PksPos[4]
+                    Parameter[i, 13] = result.params['amp5'].value
+                    Parameter[i, 14] = result.params['sigma5'].value
+
+                    GaussFit[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 0:3])
+                    GaussFit[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 3:6])
+                    GaussFit[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 6:9])
+                    GaussFit[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 9:12])
+                    GaussFit[i, :, 4] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 12:15])
+
+                    SumSpec[i, :] = GaussFit[i, :, 0] + GaussFit[i, :, 1] + GaussFit[i, :, 2] + GaussFit[i, :, 3] + GaussFit[i, :, 4]
+                    del result
+                except RuntimeError:
+                    print("Error - deconvolution failed")
+                    continue
+
+    if peak_number == 6: 
+        for i in range(TSregion1, TSregion2):
+            if sum(TimeSeries[i, :]) != 0:
+                try:
+                    fmodel = Model(_fit6G)
+                    params = fmodel.make_params(PksPos1=PksPos[0], PksPos2=PksPos[1], PksPos3=PksPos[2], PksPos4=PksPos[3], PksPos5=PksPos[4], PksPos6=PksPos[5],
+                             cen=fit_guess[0],
+                             amp1=fit_guess[1], amp2=fit_guess[2], amp3=fit_guess[3], amp4=fit_guess[4], amp5=fit_guess[5], amp6=fit_guess[6],
+                             sigma1=fit_guess[7], sigma2=fit_guess[8], sigma3=fit_guess[9], sigma4=fit_guess[10], sigma5=fit_guess[11], sigma6=fit_guess[12])
+                    params['PksPos1'].vary = False
+                    params['PksPos2'].vary = False
+                    params['PksPos3'].vary = False
+                    params['PksPos4'].vary = False
+                    params['PksPos5'].vary = False
+                    params['PksPos6'].vary = False
+                    params['cen'].min = fit_bounds[0][0]
+                    params['cen'].max = fit_bounds[1][0]
+                    params['amp1'].min = fit_bounds[0][1]
+                    params['amp1'].max = fit_bounds[1][1]
+                    params['amp2'].min = fit_bounds[0][2]
+                    params['amp2'].max = fit_bounds[1][1]
+                    params['amp3'].min = fit_bounds[0][3]
+                    params['amp3'].max = fit_bounds[1][3]
+                    params['amp4'].min = fit_bounds[0][4]
+                    params['amp4'].max = fit_bounds[1][4]
+                    params['amp5'].min = fit_bounds[0][5]
+                    params['amp5'].max = fit_bounds[1][5]
+                    params['amp6'].min = fit_bounds[0][6]
+                    params['amp6'].max = fit_bounds[1][6]
+                    params['sigma1'].min = fit_bounds[0][7]
+                    params['sigma1'].max = fit_bounds[1][7]
+                    params['sigma2'].min = fit_bounds[0][8]
+                    params['sigma2'].max = fit_bounds[1][8]
+                    params['sigma3'].min = fit_bounds[0][9]
+                    params['sigma3'].max = fit_bounds[1][9]
+                    params['sigma4'].min = fit_bounds[0][10]
+                    params['sigma4'].max = fit_bounds[1][10]
+                    params['sigma5'].min = fit_bounds[0][11]
+                    params['sigma5'].max = fit_bounds[1][11]
+                    params['sigma6'].min = fit_bounds[0][12]
+                    params['sigma6'].max = fit_bounds[1][12]
+
+                    result = fmodel.fit(TimeSeries[i, start_Fit2[0][0]:end_Fit2[0][0]], params, x=energy[start_Fit2[0][0]:end_Fit2[0][0]])
+
+                    Parameter[i, 0] = result.params['cen'].value + PksPos[0]
+                    Parameter[i, 1] = result.params['amp1'].value
+                    Parameter[i, 2] = result.params['sigma1'].value
+                    Parameter[i, 3] = result.params['cen'].value + PksPos[1]
+                    Parameter[i, 4] = result.params['amp2'].value
+                    Parameter[i, 5] = result.params['sigma2'].value
+                    Parameter[i, 6] = result.params['cen'].value + PksPos[2]
+                    Parameter[i, 7] = result.params['amp3'].value
+                    Parameter[i, 8] = result.params['sigma3'].value
+                    Parameter[i, 9] = result.params['cen'].value + PksPos[3]
+                    Parameter[i, 10] = result.params['amp4'].value
+                    Parameter[i, 11] = result.params['sigma4'].value
+                    Parameter[i, 12] = result.params['cen'].value + PksPos[4]
+                    Parameter[i, 13] = result.params['amp5'].value
+                    Parameter[i, 14] = result.params['sigma5'].value
+                    Parameter[i, 15] = result.params['cen'].value + PksPos[5]
+                    Parameter[i, 16] = result.params['amp6'].value
+                    Parameter[i, 17] = result.params['sigma6'].value
+
+                    GaussFit[i, :, 0] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 0:3])
+                    GaussFit[i, :, 1] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 3:6])
+                    GaussFit[i, :, 2] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 6:9])
+                    GaussFit[i, :, 3] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 9:12])
+                    GaussFit[i, :, 4] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 12:15])
+                    GaussFit[i, :, 5] = _1gaussian(energy[start_Fit2[0][0]:end_Fit2[0][0]], *Parameter[i, 15:18])
+
+                    SumSpec[i, :] = GaussFit[i, :, 0] + GaussFit[i, :, 1] + GaussFit[i, :, 2] + GaussFit[i, :, 3] + GaussFit[i, :, 4] + GaussFit[i, :, 5]
+                    del result
+                except RuntimeError:
+                    print('Error - deconvolution failed')
+                    continue
+
+    return SumSpec, Parameter, GaussFit
 
 
 def signal_intensity(eelsSI, energy, startEnergy, endEnergy):
