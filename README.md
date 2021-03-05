@@ -3,7 +3,7 @@ WORK IN PROGRESS
 Toolbox for the automated analysis of large EELS datasets e.g. time series or spectrum images. The toolbox comprises several steps and lets you choose between different alignment methods, background models and deconvolution models. I hope it can help you with the automation of your data analysis. I have tested several datasets, but I greatly appreachiate feedback about problems with your specific dataset so that I can adjust the functions accordingly. 
 
 ### Step 1 - Import dataset:
-If you recorded a spectrum image using Gatan Digital Micrograph Version XYZ I recommend the xyz (matlab file) to convert the dataset to a python script. The functions expect your data as an array with the form [xaxis, (yaxis,) spectrum]. 
+If you recorded a spectrum image using Gatan Digital Micrograph Version GMS3.4 I recommend the dm3Reader provided by NCEM to convert the dataset to a python script. The functions expect your data as an array with the form [xaxis, (yaxis,) spectrum]. 
 
 ### Step 2 - Alignment of the spectra:
 Alignment of the dataset. In dependence of the nature of your dataset different methods are available. 
