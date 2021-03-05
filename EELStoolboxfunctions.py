@@ -11,6 +11,7 @@ import numpy as np
 import scipy as spy
 from scipy.signal import savgol_filter
 from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
 # needed to plot colormap
 import matplotlib.pyplot as plt
 import hyperspy.api as hs
@@ -999,3 +1000,30 @@ def roll_av(data, windowsize):
         data_rollav[i] = sum(data[i - int(windowsize/2):np.shape(data)[0]])/(int(windowsize/2) + np.shape(data)[0] - i)
         k = k + 1
     return data_rollav
+
+def thickness_analysis(data, energy, E_resolution, E_plasmon):
+    def gauss(x, a, x0, sigma):
+        y = a*np.exp(-(x-x0)**2/(2*sigma**2))
+        return y
+    def lorentzian(x, x0, a, gam):
+        return a * gam**2 / ( gam**2 + ( x - x0 )**2)
+    def find_nearest(array, value):
+        array = np.asarray(array)
+        idx = (np.abs(array - value)).argmin()
+        return array[idx]
+    
+    shift = 0 - energy[np.where(data[:] == np.max(data[:]))[0][0]]
+    spec_aligned = np.zeros([np.shape(data[:])[0], 2])
+    spec_aligned[:, 0] = energy + shift
+    spec_aligned[:, 1] = data[:]
+    
+    popt, pcov = curve_fit(gauss, spec_aligned[:, 0], spec_aligned[:, 1], method='dogbox', bounds=(-0.1, [np.max(spec_aligned[:, 1]), 0.1, E_resolution]))
+    plasmon_limit = np.where(spec_aligned[:, 0]==find_nearest(spec_aligned[:, 0], E_plasmon))[0][0]
+    ZLP_limit = np.where(spec_aligned[:, 0]==find_nearest(spec_aligned[:, 0], 5))[0][0]
+    Int_ZLP2 = sum(gauss(spec_aligned[0:np.where(spec_aligned[:, 0]==find_nearest(spec_aligned[:, 0], 5))[0][0], 0], *popt))
+    Int_ZLP = sum(spec_aligned[0:ZLP_limit, 1])
+    Int_Plasmon = sum(spec_aligned[0:plasmon_limit, 1])
+    thickness = -np.log(Int_ZLP/Int_Plasmon)
+    thickness2 = -np.log(Int_ZLP2/Int_Plasmon)
+    
+    return spec_aligned, thickness, thickness2
